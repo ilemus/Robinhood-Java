@@ -28,5 +28,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     
     // JSONObject
-    compile 'org.json:json:20171018'
+    compile 'org.json:json:20180813'
 }
