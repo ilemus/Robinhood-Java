@@ -12,10 +12,15 @@ public class Gateway {
 	private static final String CLIENT_ID = "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS";
 	
 	private Gateway() {
+		/* "X-Robinhood-API-Version: 1.275.0" 
+		 * "Accept: *\/*" 
+		 * "Connection: keep-alive" 
+		 * "DNT: 1"
+		 * "TE: Trailers"
+		 * "Content-Type: application/json"
+		*/
 		session.headers.put("Accept","*/*");
 		session.headers.put("Connection", "keep-alive");
-		session.headers.put("Accept-Language", "en-US,en;q=0.5");
-		session.headers.put("Accept-Encoding", "gzip, deflate, br");
 		session.headers.put("X-Robinhood-API-Version", "1.275.0");
 		session.headers.put("DNT", "1");
 		session.headers.put("TE", "Trailers");
