@@ -2,29 +2,33 @@ package robinhood;
 
 import org.json.JSONObject;
 
-public class Client {
-	private boolean DEBUG = false;
+public class Gateway {
+	private boolean DEBUG = true;
 	private boolean INSECURE = false;
 	private static final String VERSION = "1.0";
-	private static Client INSTANCE = new Client();
+	private static Gateway INSTANCE = new Gateway();
 	private Session session = new Session();
 	
 	private static final String CLIENT_ID = "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS";
 	
-	private Client() {
+	private Gateway() {
 		session.headers.put("Accept","*/*");
 		session.headers.put("Connection", "keep-alive");
+		session.headers.put("Accept-Language", "en-US,en;q=0.5");
+		session.headers.put("Accept-Encoding", "gzip, deflate, br");
+		session.headers.put("X-Robinhood-API-Version", "1.275.0");
 		session.headers.put("DNT", "1");
 		session.headers.put("TE", "Trailers");
 	}
 	
-	public static Client getInstance() {
+	public static Gateway getInstance() {
 		return INSTANCE;
 	}
 	
 	public Response login(String username, String password) {
 		// required to go to login page first
 		if (!session.cookies.containsKey("device_id")) return null;
+		if (DEBUG) System.out.println("device_id: " + session.cookies.get("device_id"));
 		JSONObject obj = new JSONObject();
 		obj.put("grant_type", "password");
 		obj.put("scope", "internal");
@@ -34,6 +38,7 @@ public class Client {
 	    obj.put("username", username);
 	    obj.put("password", password);
 	    obj.put("challenge_type", "sms");
+	    if (DEBUG) System.out.println("obj: " + obj.toString());
 		try {
 			return session.post(Urls.login(), obj);
 		} catch (Exception e) {

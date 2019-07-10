@@ -84,12 +84,11 @@ public class Session {
 		String contentType = conn.getContentType();
 		if (contentType == null) return response;
 		// Reading data from server
-		InputStream is;
-		if (response.statusCode < 300) {
-			is = conn.getInputStream();
-		} else {
-			is = conn.getErrorStream();
-		}
+		InputStream is = null;
+		if (DEBUG) System.out.println("Status code: " + response.statusCode + " content-type: " + contentType);
+		if (response.statusCode >= 300) is = conn.getErrorStream();
+		else is = conn.getInputStream();
+		if (is == null) return response;
 		InputStreamReader isr = new InputStreamReader(is);
 		StringBuilder sb = new StringBuilder();
 		char[] buffer = new char[STREAM_BUFFER_SIZE];

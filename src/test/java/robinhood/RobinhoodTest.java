@@ -9,9 +9,10 @@ import org.junit.Test;
 public class RobinhoodTest {
 	private static final String USERNAME = "test@test.com";
 	private static final String PASSWORD = "password";
+	private static final String SMS_CODE = "000000";
     @Test
     public void testLoginPage() {
-    	Client client = Client.getInstance();
+    	Gateway client = Gateway.getInstance();
     	assertNotNull(client);
 		Response resp = client.loginPage();
 		assertNotNull(resp);
@@ -19,23 +20,27 @@ public class RobinhoodTest {
     }
     @Test
     public void testLogin() {
-    	Client client = Client.getInstance();
+    	Gateway client = Gateway.getInstance();
     	client.loginPage();
 		Response resp = client.login(USERNAME, PASSWORD);
 		assertNotNull(resp);
+		System.out.println(resp);
 		assertEquals(resp.statusCode, 400);
     }
     @Test
     public void testChallenge() {
-    	Client client = Client.getInstance();
+    	Gateway client = Gateway.getInstance();
     	client.loginPage();
 		Response resp = client.login(USERNAME, PASSWORD);
 		assertNotNull(resp);
+		System.out.println(resp);
 		assertEquals(resp.statusCode, 400);
 		JSONObject obj = (JSONObject) resp.obj.get("challenge");
 		assertNotNull(obj);
 		String id = obj.getString("id");
 		assertNotNull(id);
-		client.login(USERNAME, PASSWORD);
+		resp = client.challenge(id, SMS_CODE);
+		assertNotNull(resp);
+		assertEquals(resp.statusCode, 400);
     }
 }
