@@ -30,3 +30,15 @@ dependencies {
     // JSONObject
     compile 'org.json:json:20180813'
 }
+
+/*
+jar {
+  	manifest { 
+    	attributes "Main-Class": "robinhood.Gateway"
+  	}  
+
+  	from {
+    	configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  	}
+}
+*/

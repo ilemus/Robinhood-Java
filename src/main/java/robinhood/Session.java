@@ -68,17 +68,23 @@ public class Session {
 	// Using connection, get server response
 	private Response getResponse(HttpsURLConnection conn) throws IOException {
 		Response response = new Response();
-		response.headers = new HashMap<>();
+		// Set response headers
 		for (Map.Entry<String, List<String>> header: conn.getHeaderFields().entrySet()) {
 			response.headers.put(header.getKey(), header.getValue());
 		}
+		
+		// Set response status code
 		response.statusCode = conn.getResponseCode();
+		
+		// Set session cookies
 		if (response.headers.containsKey("Set-Cookie")) setCookies(response.headers.get("Set-Cookie").get(0));
+		
+		// Get response Content-Type
 		String contentType = conn.getContentType();
 		if (contentType == null) return response;
-		// Reading data from server
+		
+		// Read body data
 		InputStream is = null;
-		if (DEBUG) System.out.println("Status code: " + response.statusCode + " content-type: " + contentType);
 		if (response.statusCode >= 300) is = conn.getErrorStream();
 		else is = conn.getInputStream();
 		if (is == null) return response;
@@ -90,6 +96,7 @@ public class Session {
 			sb.append(buffer, 0, read);
 		}
 
+		// Store body content as either JSON or text based on Content-Type
 		if (contentType.equalsIgnoreCase("application/json")) {
 			JSONObject obj = new JSONObject(sb.toString());
 			response.obj = obj;

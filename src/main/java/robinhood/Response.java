@@ -1,5 +1,6 @@
 package robinhood;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ public class Response {
 	JSONObject obj;
 	String text;
 	int statusCode;
-	Map<String, List<String>> headers;
+	Map<String, List<String>> headers = new HashMap<>();
 	
 	@Override
 	public String toString() {

@@ -2,6 +2,9 @@ package robinhood;
 
 import org.json.JSONObject;
 
+import robinhood.objects.Login;
+import robinhood.objects.Order;
+
 public class Gateway {
 	private boolean DEBUG = true;
 	private boolean INSECURE = false;
@@ -33,18 +36,13 @@ public class Gateway {
 	public Response login(String username, String password) {
 		// required to go to login page first
 		if (!session.cookies.containsKey("device_id")) return null;
-		if (DEBUG) System.out.println("device_id: " + session.cookies.get("device_id"));
-		JSONObject obj = new JSONObject();
-		obj.put("grant_type", "password");
-		obj.put("scope", "internal");
-		obj.put("client_id", CLIENT_ID);
-		obj.put("expires_in", 86400);
-		obj.put("device_token", session.cookies.get("device_id"));
-	    obj.put("username", username);
-	    obj.put("password", password);
-	    obj.put("challenge_type", "sms");
+		Login login = new Login();
+		login.username = username;
+		login.password = password;
+		login.clientId = CLIENT_ID;
+		login.deviceToken = session.cookies.get("device_id");
 		try {
-			return session.post(Urls.login(), obj);
+			return session.post(Urls.login(), login.toJson());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -76,5 +74,84 @@ public class Gateway {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public Response logout(String refreshToken) {
+		JSONObject obj = new JSONObject();
+		obj.put("client_id", CLIENT_ID);
+		obj.put("token", refreshToken);
+		try {
+			return session.post(Urls.logout(), obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response order(Order order) {
+		try {
+			return session.post(Urls.order(), order.toJson());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response instrument(String symbol) {
+		try {
+			return session.post(Urls.instruments(symbol));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response accountInfo() {
+		try {
+			return session.get(Urls.accounts());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response quote(String instrument) {
+		try {
+			return session.get(Urls.quote(instrument));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response book(String stockId) {
+		try {
+			return session.get(Urls.book(stockId));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response positions() {
+		try {
+			return session.get(Urls.positions());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public Response cancelOrder(String url) {
+		try {
+			return session.post(url);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public void setAuthorization(String token) {
+		session.headers.put("Authorization", "Basic " + token);
 	}
 }
