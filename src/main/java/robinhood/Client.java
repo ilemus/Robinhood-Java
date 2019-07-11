@@ -62,7 +62,7 @@ public class Client {
 	
 	private void symbolLookup(String symbol) {
 		String upper = symbol.toUpperCase();
-		Response resp = gateway.instrument(symbol);
+		Response resp = gateway.instrument(upper);
 		// Nothing to process
 		if (resp.statusCode != HttpURLConnection.HTTP_OK) return;
 		
@@ -74,13 +74,14 @@ public class Client {
 				.getJSONArray("results")
 				.getJSONObject(0)
 				.getString("url");
-		stockIds.put(instrument, symbol);
+		stockIds.put(instrument, upper);
 		Symbol s = new Symbol();
 		s.id = id;
 		s.instrument = instrument;
-		symbols.put(symbol, s);
+		symbols.put(upper, s);
 	}
 	
+	// Assumes symbol is always upper case
 	private void instrumentLookup(String instrument) {
 		Response resp = gateway.accessInstrument(instrument);
 		// Nothing to process
