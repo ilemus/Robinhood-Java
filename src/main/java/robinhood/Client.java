@@ -1,14 +1,19 @@
 package robinhood;
 
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.security.sasl.AuthenticationException;
+
+import robinhood.objects.Symbol;
 
 public class Client {
 	Gateway gateway = Gateway.getInstance();
 	private boolean loggedIn = false;
 	private String refreshToken;
+	private HashMap<String, Symbol> symbols = new HashMap<>();
+	private HashMap<String, String> stockIds = new HashMap<>();
 	
 	public void login(String username, String password) throws AuthenticationException {
 		// Load login page to generate device_id
@@ -53,5 +58,41 @@ public class Client {
 		gateway.logout(refreshToken);
 		refreshToken = null;
 		loggedIn = false;
+	}
+	
+	private void symbolLookup(String symbol) {
+		String upper = symbol.toUpperCase();
+		Response resp = gateway.instrument(symbol);
+		// Nothing to process
+		if (resp.statusCode != HttpURLConnection.HTTP_OK) return;
+		
+		String id = (resp.obj)
+				.getJSONArray("results")
+				.getJSONObject(0)
+				.getString("id");
+		String instrument = (resp.obj)
+				.getJSONArray("results")
+				.getJSONObject(0)
+				.getString("url");
+		stockIds.put(instrument, symbol);
+		Symbol s = new Symbol();
+		s.id = id;
+		s.instrument = instrument;
+		symbols.put(symbol, s);
+	}
+	
+	private void instrumentLookup(String instrument) {
+		Response resp = gateway.accessInstrument(instrument);
+		// Nothing to process
+		if (resp.statusCode != HttpURLConnection.HTTP_OK) return;
+		
+		String symbol = (resp.obj).getString("symbol");
+		stockIds.put(instrument, symbol);
+		Symbol s = new Symbol();
+		s.id = (resp.obj).getString("id");
+		s.instrument = instrument;
+		s.name = (resp.obj).getString("name");
+		s.simpleName = (resp.obj).getString("simple_name");
+		symbols.put(symbol, s);
 	}
 }

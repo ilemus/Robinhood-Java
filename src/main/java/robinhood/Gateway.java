@@ -143,6 +143,15 @@ public class Gateway {
 		}
 	}
 	
+	public Response accessInstrument(String url) {
+		try {
+			return session.get(url);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public void setAuthorization(String token) {
 		session.headers.put("Authorization", "Basic " + token);
 	}
