@@ -2,10 +2,13 @@ package robinhood;
 
 import java.net.HttpURLConnection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 import javax.security.sasl.AuthenticationException;
 
+import robinhood.objects.Order;
+import robinhood.objects.Quote;
 import robinhood.objects.Symbol;
 
 public class Client {
@@ -14,6 +17,7 @@ public class Client {
 	private String refreshToken;
 	private HashMap<String, Symbol> symbols = new HashMap<>();
 	private HashMap<String, String> stockIds = new HashMap<>();
+	private LinkedList<Order> orderPool = new LinkedList<>();
 	
 	public void login(String username, String password) throws AuthenticationException {
 		// Load login page to generate device_id
@@ -60,6 +64,10 @@ public class Client {
 		loggedIn = false;
 	}
 	
+	public Quote quote(String symbol) {
+		
+	}
+	
 	private void symbolLookup(String symbol) {
 		String upper = symbol.toUpperCase();
 		Response resp = gateway.instrument(upper);
@@ -95,5 +103,14 @@ public class Client {
 		s.name = (resp.obj).getString("name");
 		s.simpleName = (resp.obj).getString("simple_name");
 		symbols.put(symbol, s);
+	}
+	
+	private synchronized Order createOrder() {
+		if (orderPool.isEmpty()) return new Order();
+		else return orderPool.pop();
+	}
+	
+	private synchronized void deleteOrder(Order order) {
+		orderPool.push(order);
 	}
 }
