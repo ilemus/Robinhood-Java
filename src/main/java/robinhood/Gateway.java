@@ -6,25 +6,17 @@ import robinhood.objects.Login;
 import robinhood.objects.Order;
 
 public class Gateway {
-	private boolean DEBUG = true;
-	private boolean INSECURE = false;
-	private static final String VERSION = "1.0";
+	private static final String ROBINHOOD_API_VERSION = "1.275.0";
 	private static Gateway INSTANCE = new Gateway();
 	private Session session = new Session();
 	
 	private static final String CLIENT_ID = "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS";
 	
 	private Gateway() {
-		/* "X-Robinhood-API-Version: 1.275.0" 
-		 * "Accept: *\/*" 
-		 * "Connection: keep-alive" 
-		 * "DNT: 1"
-		 * "TE: Trailers"
-		 * "Content-Type: application/json"
-		*/
 		session.headers.put("Accept","*/*");
 		session.headers.put("Connection", "keep-alive");
-		session.headers.put("X-Robinhood-API-Version", "1.275.0");
+		session.headers.put("X-Robinhood-API-Version", ROBINHOOD_API_VERSION);
+		// Do not track (paranoid anonymous)
 		session.headers.put("DNT", "1");
 		session.headers.put("TE", "Trailers");
 	}

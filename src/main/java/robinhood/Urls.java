@@ -1,7 +1,11 @@
 package robinhood;
 
 public class Urls {
-	private static final String API = "https://api.robinhood.com";
+	private static String API = "https://api.robinhood.com";
+	public static void updateUrl(String root) {
+		API = root;
+	}
+	
     public static String accounts() {
         return API + "/accounts/";
     }
