@@ -43,7 +43,6 @@ public class Gateway {
 	    obj.put("username", username);
 	    obj.put("password", password);
 	    obj.put("challenge_type", "sms");
-	    if (DEBUG) System.out.println("obj: " + obj.toString());
 		try {
 			return session.post(Urls.login(), obj);
 		} catch (Exception e) {

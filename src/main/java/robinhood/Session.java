@@ -35,7 +35,6 @@ public class Session {
 			conn = makeConnection(url, "POST");
 			headers.remove("Content-Type");
 		}
-		conn.setDoOutput(true);
 		writeJson(conn, obj);
 		return getResponse(conn);
 	}
@@ -52,7 +51,6 @@ public class Session {
 			conn = makeConnection(url, "GET");
 			headers.remove("Content-Type");
 		}
-		conn.setDoOutput(true);
 		writeJson(conn, obj);
 		return getResponse(conn);
 	}
@@ -63,11 +61,6 @@ public class Session {
 		conn.setRequestMethod(method);
 		for (Map.Entry<String, String> header: headers.entrySet()) {
 			conn.setRequestProperty(header.getKey(), header.getValue());
-		}
-		if (DEBUG) {
-			System.out.println("Request headers..");
-			System.out.println(headers);
-			System.out.println("...Request headers");
 		}
 		return conn;
 	}
@@ -111,11 +104,15 @@ public class Session {
 	void writeJson(HttpsURLConnection conn, JSONObject obj) {
 		// Posting data to server
 		String body = obj.toString();
+		byte[] data = body.getBytes();
+		conn.setDoOutput(true);
 		OutputStream os;
 		try {
 			os = conn.getOutputStream();
 			BufferedOutputStream bos = new BufferedOutputStream(os);
-			bos.write(body.getBytes());
+			bos.write(data);
+			bos.close();
+			os.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
