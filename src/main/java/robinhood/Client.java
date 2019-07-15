@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import javax.security.sasl.AuthenticationException;
 
+import robinhood.objects.Account;
 import robinhood.objects.Book;
 import robinhood.objects.Order;
 import robinhood.objects.Quote;
@@ -93,7 +94,14 @@ public class Client {
 		
 		return new Book(resp.obj);
 	}
-	
+
+	public Account account() throws AuthenticationException {
+		Response resp = gateway.accountInfo();
+		if (resp.statusCode != 200) throw new AuthenticationException("Account info cannot be requested: " + resp.statusCode);
+		
+		return new Account(resp.obj);
+	}
+
 	private void symbolLookup(String symbol) {
 		String upper = symbol.toUpperCase();
 		Response resp = gateway.instrument(upper);
