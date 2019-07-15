@@ -91,7 +91,7 @@ public class Gateway {
 	
 	public Response instrument(String symbol) {
 		try {
-			return session.post(Urls.instruments(symbol));
+			return session.get(Urls.instruments(symbol));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -153,6 +153,6 @@ public class Gateway {
 	}
 	
 	public void setAuthorization(String token) {
-		session.headers.put("Authorization", "Basic " + token);
+		session.headers.put("Authorization", "Bearer " + token);
 	}
 }

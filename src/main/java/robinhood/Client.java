@@ -3,6 +3,7 @@ package robinhood;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import javax.security.sasl.AuthenticationException;
@@ -16,6 +17,7 @@ public class Client {
 	Gateway gateway = Gateway.getInstance();
 	private boolean loggedIn = false;
 	private String refreshToken;
+	private String authorizationToken;
 	private HashMap<String, Symbol> symbols = new HashMap<>();
 	private HashMap<String, String> stockIds = new HashMap<>();
 	private LinkedList<Order> orderPool = new LinkedList<>();
@@ -42,7 +44,6 @@ public class Client {
 		Scanner scan = new Scanner(System.in);
 		System.out.print("SMS Code: ");
 		String response = scan.next();
-		scan.close();
 		resp = gateway.challenge(challengeId, response);
 		if (resp.statusCode != HttpURLConnection.HTTP_OK) {
 			throw new AuthenticationException("SMS Challenge is failed for input code: " + response);
@@ -53,7 +54,7 @@ public class Client {
 		if (resp.statusCode != HttpURLConnection.HTTP_OK) {
 			throw new AuthenticationException("Login with challengeId is failed with status code: " + resp.statusCode);
 		}
-		String token = resp.obj.getString("access_token");
+		String token = authorizationToken = resp.obj.getString("access_token");
 		refreshToken = resp.obj.getString("refresh_token");
 		gateway.setAuthorization(token);
 		loggedIn = true;
@@ -69,26 +70,26 @@ public class Client {
 		String upper = symbol.toUpperCase();
 		if (!symbols.containsKey(upper)) {
 			symbolLookup(upper);
-			if (!symbols.containsKey(upper)) return null;
+			if (!symbols.containsKey(upper)) throw new NoSuchElementException("Cannot find symbol: " + symbol);
 		}
 		
 		String id = symbols.get(upper).id;
 		Response resp = gateway.quote(id);
-		if (resp.statusCode != 200) return null;
+		if (resp.statusCode != 200) throw new NoSuchElementException("Quote lookup failed for symbol: " + symbol + ", exception: " + resp.text);
 		
 		return new Quote(resp.obj);
 	}
 	
-	public Book book(String symbol) {
+	public Book book(String symbol) throws NoSuchElementException {
 		String upper = symbol.toUpperCase();
-		if (!symbols.containsKey(symbol)) {
+		if (!symbols.containsKey(upper)) {
 			symbolLookup(upper);
-			if (!symbols.containsKey(upper)) return null;
+			if (!symbols.containsKey(upper)) throw new NoSuchElementException("Cannot find symbol: " + symbol);
 		}
 		
 		String id = symbols.get(upper).id;
 		Response resp = gateway.book(id);
-		if (resp.statusCode != 200) return null;
+		if (resp.statusCode != 200) throw new NoSuchElementException("Book lookup failed for symbol: " + symbol + ", exception: " + resp.text);
 		
 		return new Book(resp.obj);
 	}
@@ -97,7 +98,10 @@ public class Client {
 		String upper = symbol.toUpperCase();
 		Response resp = gateway.instrument(upper);
 		// Nothing to process
-		if (resp.statusCode != HttpURLConnection.HTTP_OK) return;
+		if (resp.statusCode != HttpURLConnection.HTTP_OK) {
+			System.err.println("Instrument lookup failed: [" + resp.statusCode +"] " + resp.text + ", " + resp.obj);
+			return;
+		}
 		
 		String id = (resp.obj)
 				.getJSONArray("results")
@@ -137,5 +141,22 @@ public class Client {
 	
 	private synchronized void deleteOrder(Order order) {
 		orderPool.push(order);
+	}
+	
+	public String getAuthToken() {
+		return authorizationToken;
+	}
+	
+	public void setAuthToken(String token) {
+		authorizationToken = token;
+		gateway.setAuthorization(token);
+	}
+	
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+	
+	public void setRefreshToken(String token) {
+		refreshToken = token;
 	}
 }

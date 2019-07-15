@@ -35,6 +35,7 @@ public class RobinhoodTest {
 		assertNotNull(resp);
 		System.out.println(resp);
 		assertEquals(resp.statusCode, 400);
+		/*
 		JSONObject obj = (JSONObject) resp.obj.get("challenge");
 		assertNotNull(obj);
 		String id = obj.getString("id");
@@ -42,5 +43,6 @@ public class RobinhoodTest {
 		resp = client.challenge(id, SMS_CODE);
 		assertNotNull(resp);
 		assertEquals(resp.statusCode, 400);
+		*/
     }
 }

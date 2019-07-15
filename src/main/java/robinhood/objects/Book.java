@@ -26,7 +26,7 @@ public class Book {
 	public Row getBid(int i) {
 		JSONArray arr = obj.getJSONArray("bids");
 		JSONObject row = arr.getJSONObject(i);
-		return new Row(row.getJSONObject("price").getString("amount"), row.getString("quantity"));
+		return new Row(row.getJSONObject("price").getString("amount"), row.getInt("quantity"));
 	}
 	
 	public int getBidLength() {
@@ -36,7 +36,7 @@ public class Book {
 	public Row getAsk(int i) {
 		JSONArray arr = obj.getJSONArray("asks");
 		JSONObject row = arr.getJSONObject(i);
-		Row r = new Row(row.getJSONObject("price").getString("amount"), row.getString("quantity"));
+		Row r = new Row(row.getJSONObject("price").getString("amount"), row.getInt("quantity"));
 				/* pool.isEmpty()
 				? new Row(row.getJSONObject("price").getString("amount"), row.getString("quantity"))
 				: pool.pop().setAmount(row.getJSONObject("price").getString("amount")).setQuantity(row.getString("quantity"));
@@ -50,9 +50,9 @@ public class Book {
 	
 	public static class Row {
 		public String amount;
-		public String quantity;
+		public int quantity;
 		
-		public Row(String amount, String quantity) {
+		public Row(String amount, int quantity) {
 			this.amount = amount;
 			this.quantity = quantity;
 		}
@@ -62,7 +62,7 @@ public class Book {
 			return this;
 		}
 		
-		Row setQuantity(String quantity) {
+		Row setQuantity(int quantity) {
 			this.quantity = quantity;
 			return this;
 		}
