@@ -107,9 +107,9 @@ public class Gateway {
 		}
 	}
 	
-	public Response quote(String instrument) {
+	public Response quote(String id) {
 		try {
-			return session.get(Urls.quote(instrument));
+			return session.get(Urls.quote(id));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

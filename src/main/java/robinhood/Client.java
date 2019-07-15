@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import javax.security.sasl.AuthenticationException;
 
+import robinhood.objects.Book;
 import robinhood.objects.Order;
 import robinhood.objects.Quote;
 import robinhood.objects.Symbol;
@@ -65,7 +66,31 @@ public class Client {
 	}
 	
 	public Quote quote(String symbol) {
+		String upper = symbol.toUpperCase();
+		if (!symbols.containsKey(upper)) {
+			symbolLookup(upper);
+			if (!symbols.containsKey(upper)) return null;
+		}
 		
+		String id = symbols.get(upper).id;
+		Response resp = gateway.quote(id);
+		if (resp.statusCode != 200) return null;
+		
+		return new Quote(resp.obj);
+	}
+	
+	public Book book(String symbol) {
+		String upper = symbol.toUpperCase();
+		if (!symbols.containsKey(symbol)) {
+			symbolLookup(upper);
+			if (!symbols.containsKey(upper)) return null;
+		}
+		
+		String id = symbols.get(upper).id;
+		Response resp = gateway.book(id);
+		if (resp.statusCode != 200) return null;
+		
+		return new Book(resp.obj);
 	}
 	
 	private void symbolLookup(String symbol) {
